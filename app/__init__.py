@@ -1,0 +1,1 @@
+"""Konsole UI FastAPI Application"""
