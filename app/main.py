@@ -8,7 +8,11 @@ import logging
 from pathlib import Path
 
 from app.core.config import get_settings
-from app.database import connect_to_mongo, close_mongo_connection
+from app.database import connect_to_mongo, close_mongo_connection, DatabaseConnectionError
+from app.routers import namespaces as namespaces_router
+from app.routers import applications as applications_router
+from app.routers import health as health_router
+from app.services.kube_service import KubeServiceError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -62,9 +66,29 @@ app.add_middleware(
 frontend_path = Path(__file__).parent.parent / "frontend"
 if frontend_path.exists():
     app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
+else:
+    logger.warning(f"Frontend directory not found at {frontend_path}")
 
 
 # Exception handlers
+@app.exception_handler(KubeServiceError)
+async def kube_exception_handler(request: Request, exc: KubeServiceError):
+    logger.error(f"Kubernetes service error: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=503,
+        content={"detail": str(exc), "message": "Kubernetes cluster unavailable"},
+    )
+
+
+@app.exception_handler(DatabaseConnectionError)
+async def database_exception_handler(request: Request, exc: DatabaseConnectionError):
+    logger.error(f"Database connection error: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=503,
+        content={"detail": str(exc), "message": "MongoDB connection unavailable"},
+    )
+
+
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     """Global exception handler for consistent error responses"""
@@ -76,6 +100,12 @@ async def general_exception_handler(request: Request, exc: Exception):
             "message": "Internal server error"
         }
     )
+
+
+# Include API routers
+app.include_router(namespaces_router.router, prefix="/api")
+app.include_router(applications_router.router, prefix="/api")
+app.include_router(health_router.router, prefix="/api")
 
 
 # Health check endpoint
@@ -95,6 +125,7 @@ async def root():
     return {
         "message": "Welcome to Konsole UI API",
         "docs": "/docs",
+        "dashboard": "/static/index.html",
         "version": "0.1.0"
     }
 
@@ -107,6 +138,10 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
+    
+    logger.info(f"Starting Konsole UI on http://localhost:{settings.server_port}")
+    logger.info(f"Dashboard: http://localhost:{settings.server_port}/static/index.html")
+    logger.info(f"API Docs: http://localhost:{settings.server_port}/docs")
     
     uvicorn.run(
         "app.main:app",

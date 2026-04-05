@@ -8,19 +8,21 @@ class Settings(BaseSettings):
     
     # MongoDB Configuration
     mongodb_uri: str = "mongodb://localhost:27017"
-    mongodb_db_name: str = "konsole_ui"
+    mongodb_db_name: str = "konsole_db"
+    mongodb_max_pool_size: int = 50
     
     # Kubernetes Configuration
     kube_context: str = "default"
     kube_namespace: str = "default"
     kubeconfig: str = ""
+    demo_mode: bool = True
     
     # FastAPI Configuration
     debug: bool = False
     log_level: str = "info"
     
     # Server Configuration
-    server_port: int = 3000
+    server_port: int = 8000
     
     class Config:
         env_file = ".env"

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Konsole UI Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div>
+                <h1>Konsole UI Dashboard</h1>
+                <p class="subtitle">Kubernetes inventory, app metadata, migration roadmap, and governance observability</p>
+            </div>
+            <div class="selector-panel">
+                <label for="namespace-select">Select namespace</label>
+                <input id="namespace-search" type="search" placeholder="Search namespace..." autocomplete="off" />
+                <select id="namespace-select" aria-label="Namespace selector">
+                    <option value="">Loading namespaces...</option>
+                </select>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <section class="panel panel-primary" id="pods-panel">
+                <div class="panel-header">
+                    <h2>Pods</h2>
+                    <span id="pods-count">0</span>
+                </div>
+                <div class="panel-body">
+                    <div class="status-row" id="pods-empty">Select a namespace to view pods.</div>
+                    <div class="table-wrapper">
+                        <table id="pods-table">
+                            <thead>
+                                <tr>
+                                    <th>Pod</th>
+                                    <th>Status</th>
+                                    <th>Containers</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel panel-secondary" id="resources-panel">
+                <div class="panel-header">
+                    <h2>Resource Usage</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="usage-summary">
+                        <div>
+                            <span class="usage-label">CPU</span>
+                            <div class="usage-value" id="cpu-usage">-</div>
+                        </div>
+                        <div>
+                            <span class="usage-label">Memory</span>
+                            <div class="usage-value" id="memory-usage">-</div>
+                        </div>
+                    </div>
+                    <div class="usage-bars">
+                        <div class="usage-bar-row">
+                            <span>CPU usage</span>
+                            <div class="progress">
+                                <div id="cpu-progress" class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="usage-bar-row">
+                            <span>Memory usage</span>
+                            <div class="progress">
+                                <div id="memory-progress" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel panel-accent" id="application-panel">
+                <div class="panel-header">
+                    <h2>Application Info</h2>
+                </div>
+                <div class="panel-body" id="application-body">
+                    <div class="info-row"><strong>Application:</strong> <span id="app-name">-</span></div>
+                    <div class="info-row"><strong>Microservices:</strong> <span id="microservices">-</span></div>
+                    <div class="info-row"><strong>Repository:</strong> <a href="#" id="repo-url" target="_blank" rel="noopener noreferrer">-</a></div>
+                    <div class="info-row"><strong>Tech stack:</strong> <span id="tech-stack">-</span></div>
+                </div>
+            </section>
+
+            <section class="panel panel-neutral" id="migration-panel">
+                <div class="panel-header">
+                    <h2>Migration Status</h2>
+                </div>
+                <div class="panel-body" id="migration-body">
+                    <div class="info-row"><strong>Status:</strong> <span id="roadmap-status">-</span></div>
+                    <div class="info-row"><strong>Progress:</strong> <span id="migration-progress">-</span></div>
+                    <div class="info-row"><strong>Owner/Team:</strong> <span id="ownership">-</span></div>
+                    <div class="info-row"><strong>Hosting:</strong> <span id="hosting-location">-</span></div>
+                </div>
+            </section>
+
+            <section class="panel panel-info" id="governance-panel">
+                <div class="panel-header">
+                    <h2>Governance Labels</h2>
+                </div>
+                <div class="panel-body" id="governance-body">
+                    <div class="governance-row"><span>dx-id</span><span id="label-dx-id" class="status-pill">-</span></div>
+                    <div class="governance-row"><span>dx-environment</span><span id="label-dx-environment" class="status-pill">-</span></div>
+                    <div class="governance-row"><span>dx-is-production</span><span id="label-dx-is-production" class="status-pill">-</span></div>
+                </div>
+            </section>
+        </main>
+
+        <div id="message-banner" class="message-banner hidden"></div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
